@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from patchtst import PatchTST
 from datetime import datetime
@@ -39,7 +40,7 @@ config = {
       'batch_size': 'auto',
       'shuffle': False
     },
-    'loss_fn': nn.functional.mse_loss,
+    'loss_fn': F.mse_loss,
     'optim': torch.optim.AdamW,
     'optim_params': {
       'lr': 0.001,
@@ -54,7 +55,7 @@ config = {
     },
 
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 100,
+    'epochs': 1,
   },
 
   'cv_params':{

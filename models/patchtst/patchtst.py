@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.nn.functional as F
 import torch
 
 class PatchTST(nn.Module):
@@ -18,5 +19,5 @@ class PatchTST(nn.Module):
     x = x + self._pos
     x = self.transformer_encoder(x)   # (batch_size, n_token, model_dim)
     x = x.view(x.size(0), -1)       # (batch_size, n_token * model_dim)
-    output = self.output_layer(x)   # (batch_size, out_dim =4 patch_size == 4)
-    return nn.Sigmoid(output)
+    output = self.output_layer(x)  # (batch_size, out_dim =4 patch_size == 4)
+    return F.sigmoid(output)

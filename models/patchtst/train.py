@@ -37,7 +37,6 @@ def main(cfg):
   from tqdm.auto import trange
   import matplotlib.pyplot as plt
   import seaborn as sns
-  import statsmodels.api as sm # 임시 데이터
 
   from patchtsdataset import PatchTSDataset
   from eval import evaluate
@@ -54,33 +53,88 @@ def main(cfg):
   
   # read_csv
   files = cfg.get('files')
-  '''
-  X_trn = torch.tensor(pd.read_csv(files.get('X_trn')).to_numpy(dtype=np.float32))
-  y_trn = torch.tensor(pd.read_csv(files.get('y_trn')).to_numpy(dtype=np.float32)).reshape(-1, 1)
-  X_tst = torch.tensor(pd.read_csv(files.get('X_tst')).to_numpy(dtype=np.float32))
-  y_tst = torch.tensor(pd.read_csv(files.get('y_tst')).to_numpy(dtype=np.float32)).reshape(-1, 1)
-  '''
-  # 임시 데이터
-  data = sm.datasets.sunspots.load_pandas().data
-  data.index = pd.Index(sm.tsa.datetools.dates_from_range("1700", "2008"))
-  data.index.freq = data.index.inferred_freq
-  del data["YEAR"]
+  trn = pd.read_csv('../../data/train.csv')
+  
+  def df2d_to_array3d(df_2d):
+    feature_size=df_2d.iloc[:,2:].shape[1]
+    time_size=len(df_2d['date_time'].value_counts())
+    sample_size=len(df_2d.num.value_counts())
+    return df_2d.iloc[:,2:].values.reshape([sample_size, time_size, feature_size])
+  
+  train=torch.tensor(df2d_to_array3d(trn))
+  tst_size = int(2040 * .1)
+  trn_0, tst_0 = train[0,:-tst_size,0].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,0].unsqueeze(1).numpy().astype(np.float32)
+  trn_1, tst_1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,1].unsqueeze(1).numpy().astype(np.float32)
+  trn_2, tst_2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,2].unsqueeze(1).numpy().astype(np.float32)
+  trn_3, tst_3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,3].unsqueeze(1).numpy().astype(np.float32)
+  trn_4, tst_4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,4].unsqueeze(1).numpy().astype(np.float32)
+  trn_5, tst_5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,5].unsqueeze(1).numpy().astype(np.float32)
+  trn_6, tst_6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,6].unsqueeze(1).numpy().astype(np.float32)
 
-  tst_size = 20
-  scaler = MinMaxScaler()
-  trn_scaled = scaler.fit_transform(data[:-tst_size].to_numpy(dtype=np.float32)).flatten()
-  tst_scaled = scaler.transform(data[-tst_size-window_size:].to_numpy(dtype=np.float32)).flatten()
+  
+  scaler0 = MinMaxScaler()
+  trn0 = scaler0.fit_transform(trn_0).flatten()
+  tst0 = scaler0.transform(tst_0).flatten()
 
-  # trn(dataset, dataloader)
+  scaler1 = MinMaxScaler()
+  trn1 = scaler1.fit_transform(trn_1).flatten()
+  tst1 = scaler1.transform(tst_1).flatten()
+
+  scaler2 = MinMaxScaler()
+  trn2 = scaler2.fit_transform(trn_2).flatten()
+  tst2 = scaler2.transform(tst_2).flatten()
+
+  scaler3 = MinMaxScaler()
+  trn3 = scaler3.fit_transform(trn_3).flatten()
+  tst3 = scaler3.transform(tst_3).flatten()
+
+  scaler4 = MinMaxScaler()
+  trn4 = scaler4.fit_transform(trn_4).flatten()
+  tst4 = scaler4.transform(tst_4).flatten()
+
+  scaler5 = MinMaxScaler()
+  trn5 = scaler5.fit_transform(trn_5).flatten()
+  tst5 = scaler5.transform(tst_5).flatten()
+
+  scaler6 = MinMaxScaler()
+  trn6 = scaler6.fit_transform(trn_6).flatten()
+  tst6 = scaler6.transform(tst_6).flatten()햐ㅛ
+
   trn_dl_params = train_params.get('trn_data_loader_params')
-  trn_ds = PatchTSDataset(trn_scaled, patch_length, n_patches)
+  trn_ds0 = PatchTSDataset(trn0, patch_length, n_patches)
+  trn_ds1 = PatchTSDataset(trn1, patch_length, n_patches)
+  trn_ds2 = PatchTSDataset(trn2, patch_length, n_patches)
+  trn_ds3 = PatchTSDataset(trn3, patch_length, n_patches)
+  trn_ds4 = PatchTSDataset(trn4, patch_length, n_patches)
+  trn_ds5 = PatchTSDataset(trn5, patch_length, n_patches)
+  trn_ds6 = PatchTSDataset(trn6, patch_length, n_patches)
+
+  trn_ds = torch.utils.data.ConcatDataset([trn_ds0, trn_ds1, trn_ds2, trn_ds3, trn_ds4, trn_ds5, trn_ds6])
   trn_dl = DataLoader(trn_ds, **trn_dl_params)
 
-  # tst(dataset, dataloader)
-  tst_dl_params = train_params.get('trn_data_loader_params')
-  tst_ds = PatchTSDataset(tst_scaled, patch_length, n_patches)
+  tst_dl_params = train_params.get('tst_data_loader_params')
+  tst_ds0 = PatchTSDataset(tst0, patch_length, n_patches)
+  tst_ds1 = PatchTSDataset(tst1, patch_length, n_patches)
+  tst_ds2 = PatchTSDataset(tst2, patch_length, n_patches)
+  tst_ds3 = PatchTSDataset(tst3, patch_length, n_patches)
+  tst_ds4 = PatchTSDataset(tst4, patch_length, n_patches)
+  tst_ds5 = PatchTSDataset(tst5, patch_length, n_patches)
+  tst_ds6 = PatchTSDataset(tst6, patch_length, n_patches)
+
+  tst_ds = torch.utils.data.ConcatDataset([tst_ds0,tst_ds1,tst_ds2,tst_ds3,tst_ds4,tst_ds5,tst_ds6])
   tst_dl_params['batch_size'] = len(tst_ds)
   tst_dl = DataLoader(tst_ds, **tst_dl_params)
+
+  # # trn(dataset, dataloader)
+  # trn_dl_params = train_params.get('trn_data_loader_params')
+  # trn_ds = PatchTSDataset(trn1, patch_length, n_patches)
+  # trn_dl = DataLoader(trn_ds, **trn_dl_params)
+
+  # # tst(dataset, dataloader)
+  # tst_dl_params = train_params.get('tst_data_loader_params')
+  # tst_ds = PatchTSDataset(tst1, patch_length, n_patches)
+  # tst_dl_params['batch_size'] = len(tst_ds)
+  # tst_dl = DataLoader(tst_ds, **tst_dl_params)
 
   model = cfg.get('model')
   model_params = cfg.get('model_params')
@@ -97,7 +151,7 @@ def main(cfg):
     trn_loss = train_one_epoch(model, loss_fn, optimizer, trn_dl, device)
     tst_loss = evaluate(model, loss_fn, tst_dl, device)
     history['trn_loss'].append(trn_loss)
-    history['tst_loss'].append(trn_loss)
+    history['tst_loss'].append(tst_loss)
     pbar.set_postfix(trn_loss=trn_loss, tst_loss=tst_loss)
   
   # eval
@@ -107,13 +161,12 @@ def main(cfg):
     x, y = x.to(device), y.to(device)
     p = model(x)
 
-  scaler = MinMaxScaler()
-  y = scaler.inverse_transform(y.cpu())
-  p = scaler.inverse_transform(p.cpu())
-
+  y = scaler0.inverse_transform(y.cpu())
+  p = scaler0.inverse_transform(p.cpu())
+  
   y = np.concatenate([y[:,0], y[-1,1:]])
   p = np.concatenate([p[:,0], p[-1,1:]])
-
+  
   # log
   log = files.get('output_log')
 
@@ -128,7 +181,7 @@ def main(cfg):
   plt.savefig(f'losses_{log}.png')
 
   # predict and metric
-  predict_range = 10
+  predict_range = len(y)
   plt.figure(figsize=(8, 6))
   plt.plot(range(predict_range), y, label="True")
   plt.plot(range(predict_range), p, label="Prediction")
@@ -156,6 +209,5 @@ if __name__ == "__main__":
   #TODO
   '''
   장기예측
-  멀티 체널
 
   '''
