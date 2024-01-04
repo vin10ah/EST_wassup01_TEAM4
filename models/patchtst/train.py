@@ -98,7 +98,7 @@ def main(cfg):
 
   scaler6 = MinMaxScaler()
   trn6 = scaler6.fit_transform(trn_6).flatten()
-  tst6 = scaler6.transform(tst_6).flatten()햐ㅛ
+  tst6 = scaler6.transform(tst_6).flatten()
 
   trn_dl_params = train_params.get('trn_data_loader_params')
   trn_ds0 = PatchTSDataset(trn0, patch_length, n_patches)
