@@ -13,3 +13,4 @@ class MANN(nn.Module):
     x = self.activation(x)
     x = self.lin2(x)    # (B, d_out)
     return nn.Sigmoid(x)
+    

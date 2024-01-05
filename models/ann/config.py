@@ -56,9 +56,4 @@ config = {
     'epochs': 1,
   },
 
-  'cv_params':{
-    'n_splits': 5,
-    'shuffle':False,
-  },
-
 }

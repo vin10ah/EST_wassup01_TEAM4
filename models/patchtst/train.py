@@ -68,13 +68,13 @@ def main(cfg):
   train=torch.tensor(df2d_to_array3d(trn))
   tst_size = int(2040 * .1)
   trn0, tst0 = train[0,:-tst_size,0].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,0].unsqueeze(1).numpy().astype(np.float32)
-  trn1, tst1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,1].unsqueeze(1).numpy().astype(np.float32)
-  trn2, tst2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,2].unsqueeze(1).numpy().astype(np.float32)
-  trn3, tst3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,3].unsqueeze(1).numpy().astype(np.float32)
-  trn4, tst4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,4].unsqueeze(1).numpy().astype(np.float32)
-  trn5, tst5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,5].unsqueeze(1).numpy().astype(np.float32)
-  trn6, tst6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,6].unsqueeze(1).numpy().astype(np.float32)
-  trn7, tst7 = train[0,:-tst_size,7].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,7].unsqueeze(1).numpy().astype(np.float32)
+  trn1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32)
+  trn2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32)
+  trn3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32)
+  trn4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32)
+  trn5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32)
+  trn6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32)
+  trn7 = train[0,:-tst_size,7].unsqueeze(1).numpy().astype(np.float32)
 
   
   scaler0 = MinMaxScaler() # elec_amount
@@ -83,31 +83,24 @@ def main(cfg):
 
   scaler1 = MinMaxScaler() # temp
   trn1 = scaler1.fit_transform(trn1).flatten()
-  tst1 = scaler1.transform(tst1).flatten()
 
   scaler2 = MinMaxScaler() # wind_speed
   trn2 = scaler2.fit_transform(trn2).flatten()
-  tst2 = scaler2.transform(tst2).flatten()
 
   scaler3 = MinMaxScaler() # humidity
   trn3 = scaler3.fit_transform(trn3).flatten()
-  tst3 = scaler3.transform(tst3).flatten()
 
   scaler4 = MinMaxScaler() # rainfall
   trn4 = scaler4.fit_transform(trn4).flatten()
-  tst4 = scaler4.transform(tst4).flatten()
 
   scaler5 = MinMaxScaler() # sunshine
   trn5 = scaler5.fit_transform(trn5).flatten()
-  tst5 = scaler5.transform(tst5).flatten()
 
   scaler6 = MinMaxScaler() # no_elec
   trn6 = scaler6.fit_transform(trn6).flatten()
-  tst6 = scaler6.transform(tst6).flatten()
 
   scaler7 = MinMaxScaler() # sunlight_have
   trn7 = scaler7.fit_transform(trn7).flatten()
-  tst7 = scaler7.transform(tst7).flatten()
 
   trn_dl_params = train_params.get('trn_data_loader_params')
   trn_ds = PatchTSDataset(trn0, patch_length, n_patches, prediction_length)
@@ -124,15 +117,7 @@ def main(cfg):
 
   tst_dl_params = train_params.get('tst_data_loader_params')
   tst_ds = PatchTSDataset(tst0, patch_length, n_patches, prediction_length)
-  tst_ds1 = PatchTSDataset(tst1, patch_length, n_patches, prediction_length)
-  tst_ds2 = PatchTSDataset(tst2, patch_length, n_patches, prediction_length)
-  tst_ds3 = PatchTSDataset(tst3, patch_length, n_patches, prediction_length)
-  tst_ds4 = PatchTSDataset(tst4, patch_length, n_patches, prediction_length)
-  tst_ds5 = PatchTSDataset(tst5, patch_length, n_patches, prediction_length)
-  tst_ds6 = PatchTSDataset(tst6, patch_length, n_patches, prediction_length)
-  tst_ds7 = PatchTSDataset(tst7, patch_length, n_patches, prediction_length)
-
-  tst_ds = torch.utils.data.ConcatDataset([tst_ds,tst_ds1,tst_ds2,tst_ds3,tst_ds4,tst_ds5,tst_ds6, tst_ds7])
+ 
   tst_dl_params['batch_size'] = len(tst_ds)
   tst_dl = DataLoader(tst_ds, **tst_dl_params)
 

@@ -51,7 +51,7 @@ def main(cfg):
   
   # read_csv
   files = cfg.get('files')
-  trn = pd.read_csv(files.get('X_csv'))
+  trn = pd.read_csv(files.get('X_csv')) 
 
   # dataset
   dataset_params = train_params.get('dataset_params')
@@ -60,10 +60,10 @@ def main(cfg):
 
   # data split
   def df2d_to_array3d(df_2d):
-    feature_size=df_2d.iloc[:,2:].shape[1]
-    time_size=len(df_2d['date_time'].value_counts())
-    sample_size=len(df_2d.num.value_counts())
-    return df_2d.iloc[:,2:].values.reshape([sample_size, time_size, feature_size])
+    feature_size=df_2d.iloc[:,2:].shape[1] # 8
+    time_size=len(df_2d['date_time'].value_counts()) # 2040
+    sample_size=len(df_2d.num.value_counts()) # 60
+    return df_2d.iloc[:,2:].values.reshape([sample_size, time_size, feature_size]) # (60, 2040, 8)
   
   train=torch.tensor(df2d_to_array3d(trn))
   tst_size = int(2040 * .1)
@@ -81,7 +81,7 @@ def main(cfg):
   scaler0 = MinMaxScaler()
   trn0 = scaler0.fit_transform(trn_0).flatten()
   tst0 = scaler0.transform(tst_0).flatten()
-  print(tst0)
+  
   # scaler1 = MinMaxScaler()
   # trn1 = scaler1.fit_transform(trn_1).flatten()
   # tst1 = scaler1.transform(tst_1).flatten()

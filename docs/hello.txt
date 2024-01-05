@@ -1,1 +1,15 @@
 # TODO LIST
+
+1. weight_decay default 값 확인
+2. metric 전부 구현
+3. ann 멀티채널 구현
+4. ann config input_dim, out_dim 수정
+5. trn, val, tst data split
+6. test부분 구현
+7. sarima 코드 정리
+8. 채널 바꾸기 config에서 구현
+9. 장기예측 구현
+10. out_dim = 7일치 (24*7)
+11. 그래프 찌그러진거 (v)
+
+12. 60개 -> 60개
