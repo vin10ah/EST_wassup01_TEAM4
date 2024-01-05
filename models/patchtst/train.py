@@ -46,10 +46,14 @@ def main(cfg):
   
   train_params = cfg.get('train_params')
   device = torch.device(train_params.get('device'))
-  dataset_params = train_params.get('dataset_params')
-  patch_length = dataset_params.get('patch_length')
-  n_patches = dataset_params.get('n_patches')
+
+  model = cfg.get('model')
+  model_params = cfg.get('model_params')
+
+  patch_length = model_params.get('input_dim')
+  n_patches = model_params.get('n_token')
   window_size = int(patch_length * n_patches / 2)
+  prediction_length = model_params.get('output_dim')
   
   # read_csv
   files = cfg.get('files')
@@ -101,25 +105,25 @@ def main(cfg):
   tst6 = scaler6.transform(tst_6).flatten()
 
   trn_dl_params = train_params.get('trn_data_loader_params')
-  trn_ds0 = PatchTSDataset(trn0, patch_length, n_patches)
-  trn_ds1 = PatchTSDataset(trn1, patch_length, n_patches)
-  trn_ds2 = PatchTSDataset(trn2, patch_length, n_patches)
-  trn_ds3 = PatchTSDataset(trn3, patch_length, n_patches)
-  trn_ds4 = PatchTSDataset(trn4, patch_length, n_patches)
-  trn_ds5 = PatchTSDataset(trn5, patch_length, n_patches)
-  trn_ds6 = PatchTSDataset(trn6, patch_length, n_patches)
+  trn_ds0 = PatchTSDataset(trn0, patch_length, n_patches, prediction_length)
+  trn_ds1 = PatchTSDataset(trn1, patch_length, n_patches, prediction_length)
+  trn_ds2 = PatchTSDataset(trn2, patch_length, n_patches, prediction_length)
+  trn_ds3 = PatchTSDataset(trn3, patch_length, n_patches, prediction_length)
+  trn_ds4 = PatchTSDataset(trn4, patch_length, n_patches, prediction_length)
+  trn_ds5 = PatchTSDataset(trn5, patch_length, n_patches, prediction_length)
+  trn_ds6 = PatchTSDataset(trn6, patch_length, n_patches, prediction_length)
 
   trn_ds = torch.utils.data.ConcatDataset([trn_ds0, trn_ds1, trn_ds2, trn_ds3, trn_ds4, trn_ds5, trn_ds6])
   trn_dl = DataLoader(trn_ds, **trn_dl_params)
 
   tst_dl_params = train_params.get('tst_data_loader_params')
-  tst_ds0 = PatchTSDataset(tst0, patch_length, n_patches)
-  tst_ds1 = PatchTSDataset(tst1, patch_length, n_patches)
-  tst_ds2 = PatchTSDataset(tst2, patch_length, n_patches)
-  tst_ds3 = PatchTSDataset(tst3, patch_length, n_patches)
-  tst_ds4 = PatchTSDataset(tst4, patch_length, n_patches)
-  tst_ds5 = PatchTSDataset(tst5, patch_length, n_patches)
-  tst_ds6 = PatchTSDataset(tst6, patch_length, n_patches)
+  tst_ds0 = PatchTSDataset(tst0, patch_length, n_patches, prediction_length)
+  tst_ds1 = PatchTSDataset(tst1, patch_length, n_patches, prediction_length)
+  tst_ds2 = PatchTSDataset(tst2, patch_length, n_patches, prediction_length)
+  tst_ds3 = PatchTSDataset(tst3, patch_length, n_patches, prediction_length)
+  tst_ds4 = PatchTSDataset(tst4, patch_length, n_patches, prediction_length)
+  tst_ds5 = PatchTSDataset(tst5, patch_length, n_patches, prediction_length)
+  tst_ds6 = PatchTSDataset(tst6, patch_length, n_patches, prediction_length)
 
   tst_ds = torch.utils.data.ConcatDataset([tst_ds0,tst_ds1,tst_ds2,tst_ds3,tst_ds4,tst_ds5,tst_ds6])
   tst_dl_params['batch_size'] = len(tst_ds)
@@ -136,8 +140,6 @@ def main(cfg):
   # tst_dl_params['batch_size'] = len(tst_ds)
   # tst_dl = DataLoader(tst_ds, **tst_dl_params)
 
-  model = cfg.get('model')
-  model_params = cfg.get('model_params')
   model = model(**model_params).to(device)
 
   Optim = train_params.get('optim')

@@ -9,7 +9,7 @@ import pytz
 config = {
 
   'files': {
-    'X_trn': './data/X_trn.csv',
+    'X_trn': '../../data/train.csv',
     'y_trn': './data/y_trn.csv',
     'X_tst': './data/X_tst.csv',
     'y_tst': './data/y_tst.csv',
@@ -19,21 +19,17 @@ config = {
 
   'model': PatchTST,
   'model_params': {
-    'n_token': 8,
+    'n_token': 64, # n_patches
     'input_dim': 16, # input_dim(patch_length) Must be an even number
-    'model_dim': 512,
-    'num_heads': 8,
-    'num_layers': 4,
-    'output_dim': 4,
+    'model_dim': 128,
+    'num_heads': 16,
+    'num_layers': 3,
+    'output_dim': 24, # prediction_length
   },
 
   'train_params': {
-    'dataset_params':{
-      'patch_length': 16,
-      'n_patches': 8
-    },
     'trn_data_loader_params': {
-      'batch_size': 128,
+      'batch_size': 64,
       'shuffle': True
     },
     'tst_data_loader_params': {
@@ -43,7 +39,7 @@ config = {
     'loss_fn': F.mse_loss,
     'optim': torch.optim.AdamW,
     'optim_params': {
-      'lr': 0.001,
+      'lr': 0.0001,
       'weight_decay': 0
     },
     'lr_scheduler': ReduceLROnPlateau,
