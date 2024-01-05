@@ -21,9 +21,9 @@ config = {
   'model_params': {
     'n_token': 64, # n_patches
     'input_dim': 16, # input_dim(patch_length) Must be an even number
-    'model_dim': 128,
-    'num_heads': 16,
-    'num_layers': 3,
+    'model_dim': 128, # node
+    'num_heads': 16, # multihead
+    'num_layers': 3, # transformer layer
     'output_dim': 24, # prediction_length
   },
 
@@ -51,11 +51,6 @@ config = {
     },
 
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 100,
+    'epochs': 1,
   },
-
-  'cv_params':{
-    'n_splits': 5,
-    'shuffle':False,
-  }
 }

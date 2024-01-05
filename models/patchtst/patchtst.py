@@ -20,4 +20,5 @@ class PatchTST(nn.Module):
     x = self.transformer_encoder(x)   # (batch_size, n_token, model_dim)
     x = x.view(x.size(0), -1)       # (batch_size, n_token * model_dim)
     output = self.output_layer(x)  # (batch_size, out_dim =4 patch_size == 4)
+    return output
     return F.sigmoid(output)

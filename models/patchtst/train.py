@@ -67,78 +67,74 @@ def main(cfg):
   
   train=torch.tensor(df2d_to_array3d(trn))
   tst_size = int(2040 * .1)
-  trn_0, tst_0 = train[0,:-tst_size,0].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,0].unsqueeze(1).numpy().astype(np.float32)
-  trn_1, tst_1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,1].unsqueeze(1).numpy().astype(np.float32)
-  trn_2, tst_2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,2].unsqueeze(1).numpy().astype(np.float32)
-  trn_3, tst_3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,3].unsqueeze(1).numpy().astype(np.float32)
-  trn_4, tst_4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,4].unsqueeze(1).numpy().astype(np.float32)
-  trn_5, tst_5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,5].unsqueeze(1).numpy().astype(np.float32)
-  trn_6, tst_6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,6].unsqueeze(1).numpy().astype(np.float32)
+  trn0, tst0 = train[0,:-tst_size,0].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,0].unsqueeze(1).numpy().astype(np.float32)
+  trn1, tst1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,1].unsqueeze(1).numpy().astype(np.float32)
+  trn2, tst2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,2].unsqueeze(1).numpy().astype(np.float32)
+  trn3, tst3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,3].unsqueeze(1).numpy().astype(np.float32)
+  trn4, tst4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,4].unsqueeze(1).numpy().astype(np.float32)
+  trn5, tst5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,5].unsqueeze(1).numpy().astype(np.float32)
+  trn6, tst6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,6].unsqueeze(1).numpy().astype(np.float32)
+  trn7, tst7 = train[0,:-tst_size,7].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,7].unsqueeze(1).numpy().astype(np.float32)
 
   
-  scaler0 = MinMaxScaler()
-  trn0 = scaler0.fit_transform(trn_0).flatten()
-  tst0 = scaler0.transform(tst_0).flatten()
+  scaler0 = MinMaxScaler() # elec_amount
+  trn0 = scaler0.fit_transform(trn0).flatten()
+  tst0 = scaler0.transform(tst0).flatten()
 
-  scaler1 = MinMaxScaler()
-  trn1 = scaler1.fit_transform(trn_1).flatten()
-  tst1 = scaler1.transform(tst_1).flatten()
+  scaler1 = MinMaxScaler() # temp
+  trn1 = scaler1.fit_transform(trn1).flatten()
+  tst1 = scaler1.transform(tst1).flatten()
 
-  scaler2 = MinMaxScaler()
-  trn2 = scaler2.fit_transform(trn_2).flatten()
-  tst2 = scaler2.transform(tst_2).flatten()
+  scaler2 = MinMaxScaler() # wind_speed
+  trn2 = scaler2.fit_transform(trn2).flatten()
+  tst2 = scaler2.transform(tst2).flatten()
 
-  scaler3 = MinMaxScaler()
-  trn3 = scaler3.fit_transform(trn_3).flatten()
-  tst3 = scaler3.transform(tst_3).flatten()
+  scaler3 = MinMaxScaler() # humidity
+  trn3 = scaler3.fit_transform(trn3).flatten()
+  tst3 = scaler3.transform(tst3).flatten()
 
-  scaler4 = MinMaxScaler()
-  trn4 = scaler4.fit_transform(trn_4).flatten()
-  tst4 = scaler4.transform(tst_4).flatten()
+  scaler4 = MinMaxScaler() # rainfall
+  trn4 = scaler4.fit_transform(trn4).flatten()
+  tst4 = scaler4.transform(tst4).flatten()
 
-  scaler5 = MinMaxScaler()
-  trn5 = scaler5.fit_transform(trn_5).flatten()
-  tst5 = scaler5.transform(tst_5).flatten()
+  scaler5 = MinMaxScaler() # sunshine
+  trn5 = scaler5.fit_transform(trn5).flatten()
+  tst5 = scaler5.transform(tst5).flatten()
 
-  scaler6 = MinMaxScaler()
-  trn6 = scaler6.fit_transform(trn_6).flatten()
-  tst6 = scaler6.transform(tst_6).flatten()
+  scaler6 = MinMaxScaler() # no_elec
+  trn6 = scaler6.fit_transform(trn6).flatten()
+  tst6 = scaler6.transform(tst6).flatten()
+
+  scaler7 = MinMaxScaler() # sunlight_have
+  trn7 = scaler7.fit_transform(trn7).flatten()
+  tst7 = scaler7.transform(tst7).flatten()
 
   trn_dl_params = train_params.get('trn_data_loader_params')
-  trn_ds0 = PatchTSDataset(trn0, patch_length, n_patches, prediction_length)
+  trn_ds = PatchTSDataset(trn0, patch_length, n_patches, prediction_length)
   trn_ds1 = PatchTSDataset(trn1, patch_length, n_patches, prediction_length)
   trn_ds2 = PatchTSDataset(trn2, patch_length, n_patches, prediction_length)
   trn_ds3 = PatchTSDataset(trn3, patch_length, n_patches, prediction_length)
   trn_ds4 = PatchTSDataset(trn4, patch_length, n_patches, prediction_length)
   trn_ds5 = PatchTSDataset(trn5, patch_length, n_patches, prediction_length)
   trn_ds6 = PatchTSDataset(trn6, patch_length, n_patches, prediction_length)
+  trn_ds7 = PatchTSDataset(trn7, patch_length, n_patches, prediction_length)
 
-  trn_ds = torch.utils.data.ConcatDataset([trn_ds0, trn_ds1, trn_ds2, trn_ds3, trn_ds4, trn_ds5, trn_ds6])
+  trn_ds = torch.utils.data.ConcatDataset([trn_ds, trn_ds1, trn_ds2, trn_ds3, trn_ds4, trn_ds5, trn_ds6, trn_ds7])
   trn_dl = DataLoader(trn_ds, **trn_dl_params)
 
   tst_dl_params = train_params.get('tst_data_loader_params')
-  tst_ds0 = PatchTSDataset(tst0, patch_length, n_patches, prediction_length)
+  tst_ds = PatchTSDataset(tst0, patch_length, n_patches, prediction_length)
   tst_ds1 = PatchTSDataset(tst1, patch_length, n_patches, prediction_length)
   tst_ds2 = PatchTSDataset(tst2, patch_length, n_patches, prediction_length)
   tst_ds3 = PatchTSDataset(tst3, patch_length, n_patches, prediction_length)
   tst_ds4 = PatchTSDataset(tst4, patch_length, n_patches, prediction_length)
   tst_ds5 = PatchTSDataset(tst5, patch_length, n_patches, prediction_length)
   tst_ds6 = PatchTSDataset(tst6, patch_length, n_patches, prediction_length)
+  tst_ds7 = PatchTSDataset(tst7, patch_length, n_patches, prediction_length)
 
-  tst_ds = torch.utils.data.ConcatDataset([tst_ds0,tst_ds1,tst_ds2,tst_ds3,tst_ds4,tst_ds5,tst_ds6])
+  tst_ds = torch.utils.data.ConcatDataset([tst_ds,tst_ds1,tst_ds2,tst_ds3,tst_ds4,tst_ds5,tst_ds6, tst_ds7])
   tst_dl_params['batch_size'] = len(tst_ds)
   tst_dl = DataLoader(tst_ds, **tst_dl_params)
-
-  # # trn(dataset, dataloader)
-  # trn_dl_params = train_params.get('trn_data_loader_params')
-  # trn_ds = PatchTSDataset(trn1, patch_length, n_patches)
-  # trn_dl = DataLoader(trn_ds, **trn_dl_params)
-
-  # # tst(dataset, dataloader)
-  # tst_dl_params = train_params.get('tst_data_loader_params')
-  # tst_ds = PatchTSDataset(tst1, patch_length, n_patches)
-  # tst_dl_params['batch_size'] = len(tst_ds)
-  # tst_dl = DataLoader(tst_ds, **tst_dl_params)
 
   model = model(**model_params).to(device)
 
