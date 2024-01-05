@@ -9,7 +9,7 @@ from torchmetrics.regression import MeanAbsoluteError, MeanAbsolutePercentageErr
 config = {
 
   'files': {
-    'X_csv': './trn_X.csv',
+    'X_csv': '../../data/train.csv',
     'y_csv': './trn_y.csv',
     'output_log': datetime.now().strftime("%d%H%M%S"),
     'output_csv': 'five_fold.csv',
@@ -53,7 +53,7 @@ config = {
     },
     
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 50,
+    'epochs': 1,
   },
 
   'cv_params':{
