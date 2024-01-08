@@ -1,9 +1,11 @@
 # Custom
-# data
-# data/
+data
+data/
 output/
-# *.csv
+*.csv
 *.xlsx
+*.png
+*.pth
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -92,22 +92,32 @@ def main(cfg):
   split = preprocess_params.get('split')
   tst_size = preprocess_params.get('tst_size')
   select_channel_idx = preprocess_params.get('select_channel_idx')
+  c_n = len(select_channel_idx)
 
   trn, tst = preprocess(data, num_idx, tst_size, window_size, select_channel_idx, split)
 
   # data scale
   scaler = MinMaxScaler()
-  trn = scaler.fit_transform(trn)
-  tst = scaler.transform(tst)
+  trn_scale = scaler.fit_transform(trn[:, :1])
+  tst_scale = scaler.transform(tst[:, :1])
+  
+  
+  if c_n >= 2:
+    scaler2 = MinMaxScaler()
+    trn_m = scaler2.fit_transform(trn[:, 1:])
+    trn_scale = np.concatenate((trn_scale, trn_m), axis=1)
+
+    tst_m = scaler2.transform(tst[:, 1:])
+    tst_scale = np.concatenate((tst_scale, tst_m), axis=1)
   
   # trn(dataset, dataloader)
   trn_dl_params = train_params.get('trn_data_loader_params')
-  trn_ds = TimeseriesDataset(trn, window_size, prediction_size)
+  trn_ds = TimeseriesDataset(trn_scale, window_size, prediction_size)
   trn_dl = DataLoader(trn_ds, **trn_dl_params)
 
   # tst(dataset, dataloader)
   tst_dl_params = train_params.get('tst_data_loader_params')
-  tst_ds = TimeseriesDataset(tst, window_size, prediction_size)
+  tst_ds = TimeseriesDataset(tst_scale, window_size, prediction_size)
   tst_dl_params['batch_size'] = len(tst_ds)
   tst_dl = DataLoader(tst_ds, **tst_dl_params)
 
@@ -116,7 +126,7 @@ def main(cfg):
   model_params = cfg.get('model_params')
   model_params['input_dim'] = window_size
   model_params['output_dim'] = prediction_size
-  model_params['c_n'] = len(select_channel_idx)
+  model_params['c_n'] = c_n
   model = model(**model_params).to(device)
 
   # lr_scheduler setting
@@ -154,9 +164,9 @@ def main(cfg):
     prd = model(x)
   
   # inverse scale
-  y = y.cpu()/scaler.scale_[0] + scaler.min_[0]
-  prd = prd.cpu()/scaler.scale_[0] + scaler.min_[0]
-
+  y = scaler.inverse_transform(y.cpu())
+  prd = scaler.inverse_transform(prd.cpu())
+ 
   y = np.concatenate([y[:,0], y[-1,1:]])
   p = np.concatenate([prd[:,0], prd[-1,1:]])
 
