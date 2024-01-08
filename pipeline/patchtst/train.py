@@ -2,6 +2,8 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from collections import defaultdict
+import torchmetrics
+from typing import Optional
 
 def train_one_epoch(
   model:nn.Module,
@@ -31,6 +33,33 @@ def train_one_epoch(
     total_loss += loss.item() * len(X)
   return total_loss/len(data_loader.dataset)
 
+def evaluate(
+  model:nn.Module,
+  criterion:callable,
+  data_loader:DataLoader,
+  device:str='cpu',
+  metrics:Optional[torchmetrics.metric.Metric]=None
+) -> float:
+  '''evaluate
+  
+  Args:
+      model: model
+      criterions: list of criterion functions
+      data_loader: data loader
+      device: device
+      metrcis: metrics
+  '''
+  model.eval()
+  with torch.inference_mode():
+      X, y = next(iter(data_loader))
+      X, y = X.to(device), y.to(device)
+      output = model(X)
+      loss = criterion(output, y)
+      if metrics is not None:
+        metrics.update(output, y)
+
+  return loss.item()
+
 def main(cfg):
   import numpy as np
   import pandas as pd
@@ -39,11 +68,9 @@ def main(cfg):
   import seaborn as sns
 
   from patchtsdataset import PatchTSDataset
-  from eval import evaluate
-  from sklearn.preprocessing import MinMaxScaler
-  from metric import mape, mae
+  from metric import mape, mae, R2_score, mse, rmse
+  from preprocess import preprocess
 
-  
   train_params = cfg.get('train_params')
   device = torch.device(train_params.get('device'))
 
@@ -57,66 +84,33 @@ def main(cfg):
   
   # read_csv
   files = cfg.get('files')
-  trn = pd.read_csv('../../data/train.csv')
-  
-  def df2d_to_array3d(df_2d):
-    feature_size=df_2d.iloc[:,2:].shape[1]
-    time_size=len(df_2d['date_time'].value_counts())
-    sample_size=len(df_2d.num.value_counts())
-    return df_2d.iloc[:,2:].values.reshape([sample_size, time_size, feature_size])
-  
-  train=torch.tensor(df2d_to_array3d(trn))
-  tst_size = int(2040 * .1)
-  trn0, tst0 = train[0,:-tst_size,0].unsqueeze(1).numpy().astype(np.float32), train[0,-tst_size-window_size:,0].unsqueeze(1).numpy().astype(np.float32)
-  trn1 = train[0,:-tst_size,1].unsqueeze(1).numpy().astype(np.float32)
-  trn2 = train[0,:-tst_size,2].unsqueeze(1).numpy().astype(np.float32)
-  trn3 = train[0,:-tst_size,3].unsqueeze(1).numpy().astype(np.float32)
-  trn4 = train[0,:-tst_size,4].unsqueeze(1).numpy().astype(np.float32)
-  trn5 = train[0,:-tst_size,5].unsqueeze(1).numpy().astype(np.float32)
-  trn6 = train[0,:-tst_size,6].unsqueeze(1).numpy().astype(np.float32)
-  trn7 = train[0,:-tst_size,7].unsqueeze(1).numpy().astype(np.float32)
+  data = pd.read_csv('../../data/train.csv')
 
-  
-  scaler0 = MinMaxScaler() # elec_amount
-  trn0 = scaler0.fit_transform(trn0).flatten()
-  tst0 = scaler0.transform(tst0).flatten()
+  # preprocess prams
+  preprocess_params = cfg.get('preprocess_params')
+  num_idx = preprocess_params.get('num_idx') # building num(one of 60)
+  split = preprocess_params.get('split')
+  tst_size = preprocess_params.get('tst_size')
 
-  scaler1 = MinMaxScaler() # temp
-  trn1 = scaler1.fit_transform(trn1).flatten()
+  # preprocess
+  trn, tst, channel_ds_list = preprocess(data, num_idx, tst_size, window_size, preprocess_params.get('scaler'), patch_length, n_patches, prediction_length, split)
 
-  scaler2 = MinMaxScaler() # wind_speed
-  trn2 = scaler2.fit_transform(trn2).flatten()
+  # elec_amount scale
+  scaler = preprocess_params.get('scaler')
+  trn = scaler.fit_transform(trn).flatten()
+  tst = scaler.transform(tst).flatten()
 
-  scaler3 = MinMaxScaler() # humidity
-  trn3 = scaler3.fit_transform(trn3).flatten()
+  select_channel_idx = preprocess_params.get('select_channel_idx')
 
-  scaler4 = MinMaxScaler() # rainfall
-  trn4 = scaler4.fit_transform(trn4).flatten()
-
-  scaler5 = MinMaxScaler() # sunshine
-  trn5 = scaler5.fit_transform(trn5).flatten()
-
-  scaler6 = MinMaxScaler() # no_elec
-  trn6 = scaler6.fit_transform(trn6).flatten()
-
-  scaler7 = MinMaxScaler() # sunlight_have
-  trn7 = scaler7.fit_transform(trn7).flatten()
-
+  # select channel
+  channel_ds = [channel_ds_list[i] for i in select_channel_idx]
   trn_dl_params = train_params.get('trn_data_loader_params')
-  trn_ds = PatchTSDataset(trn0, patch_length, n_patches, prediction_length)
-  trn_ds1 = PatchTSDataset(trn1, patch_length, n_patches, prediction_length)
-  trn_ds2 = PatchTSDataset(trn2, patch_length, n_patches, prediction_length)
-  trn_ds3 = PatchTSDataset(trn3, patch_length, n_patches, prediction_length)
-  trn_ds4 = PatchTSDataset(trn4, patch_length, n_patches, prediction_length)
-  trn_ds5 = PatchTSDataset(trn5, patch_length, n_patches, prediction_length)
-  trn_ds6 = PatchTSDataset(trn6, patch_length, n_patches, prediction_length)
-  trn_ds7 = PatchTSDataset(trn7, patch_length, n_patches, prediction_length)
-
-  trn_ds = torch.utils.data.ConcatDataset([trn_ds, trn_ds1, trn_ds2, trn_ds3, trn_ds4, trn_ds5, trn_ds6, trn_ds7])
+  trn_ds = PatchTSDataset(trn, patch_length, n_patches, prediction_length)
+  trn_ds = torch.utils.data.ConcatDataset([trn_ds, *channel_ds])
   trn_dl = DataLoader(trn_ds, **trn_dl_params)
 
   tst_dl_params = train_params.get('tst_data_loader_params')
-  tst_ds = PatchTSDataset(tst0, patch_length, n_patches, prediction_length)
+  tst_ds = PatchTSDataset(tst, patch_length, n_patches, prediction_length)
  
   tst_dl_params['batch_size'] = len(tst_ds)
   tst_dl = DataLoader(tst_ds, **tst_dl_params)
@@ -144,8 +138,8 @@ def main(cfg):
     x, y = x.to(device), y.to(device)
     p = model(x)
 
-  y = scaler0.inverse_transform(y.cpu())
-  p = scaler0.inverse_transform(p.cpu())
+  y = scaler.inverse_transform(y.cpu())
+  p = scaler.inverse_transform(p.cpu())
   
   y = np.concatenate([y[:,0], y[-1,1:]])
   p = np.concatenate([p[:,0], p[-1,1:]])
@@ -169,7 +163,7 @@ def main(cfg):
   plt.plot(range(predict_range), y, label="True")
   plt.plot(range(predict_range), p, label="Prediction")
   plt.legend()
-  plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}")
+  plt.title(f"PatchTST, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, r2_score:{R2_score(p,y):.4f}, mse:{mse(p,y):.4f}, rmse:{rmse(p,y):.4f}")
   plt.savefig(f'predict_{log}.png')
 
   # model

@@ -1,0 +1,28 @@
+# TODO LIST
+
+1. weight_decay default 값 확인 (v)
+2. metric 전부 구현 (v)
+3. ann 멀티채널 구현 (v)
+4. ann config input_dim, out_dim 수정(수정 불필요 v)
+5. trn, val, tst data split (v)
+6. test부분 구현
+7. sarima 코드 정리 (v)
+8. 채널 바꾸기 config에서 구현 (v)
+9. 장기예측 구현 - 3
+10. out_dim = 7일치 (24*7) (v)
+11. 그래프 찌그러진거 (v)
+12. preprocess 작성 (v)
+13. config 정보 저장 - 2
+14. 코드 띄어쓰기 잘 되어있나 확인
+15. 전체적인 디테일 수정
+16. result에 저장
+17. seed 고정
+18. 차분데이터 사용하기
+
+
+* 
+97. 전체를 윈도우로 설정
+98. 제출용 안 만들면 train.csv -> data.csv로 파일명 바꾸기 
+99. 60개 -> 60개
+
+1. 단기(1,2,3일), 7일, 장기예측

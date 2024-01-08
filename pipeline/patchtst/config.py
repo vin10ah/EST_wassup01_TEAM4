@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from patchtst import PatchTST
 from datetime import datetime
 import pytz
@@ -15,6 +16,23 @@ config = {
     'y_tst': './data/y_tst.csv',
     'output_log': datetime.now(pytz.timezone('Asia/Seoul')).strftime("%d%H%M%S"),
     'output_csv': './results/five_fold.csv',
+  },
+
+  'preprocess_params': {
+    'num_idx': 0, # building idx
+    'split': 'train', # choose between 'train' and 'test' 
+    'tst_size': 24 * 7, # 24 hours x 7 = 7 days
+    'scaler': MinMaxScaler(),
+    'select_channel_idx':[
+                          # 0, # temp
+                          # 1, # wind_speed
+                          # 2, # humidity
+                          # 3, # rainfall
+                          # 4, # sunshine
+                          # 5, # no_elec
+                          # 6, # sunlight_have
+                          # 7, # rolling_mean
+                          ] 
   },
 
   'model': PatchTST,
@@ -40,7 +58,7 @@ config = {
     'optim': torch.optim.AdamW,
     'optim_params': {
       'lr': 0.0001,
-      'weight_decay': 0
+      'weight_decay': 0 # default 0.01
     },
     'lr_scheduler': ReduceLROnPlateau,
     'scheduler_params': {
@@ -51,6 +69,6 @@ config = {
     },
 
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 1,
+    'epochs': 200,
   },
 }
