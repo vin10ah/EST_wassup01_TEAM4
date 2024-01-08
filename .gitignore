@@ -1,8 +1,8 @@
 # Custom
-data
-data/
+# data
+# data/
 output/
-*.csv
+# *.csv
 *.xlsx
 
 # Byte-compiled / optimized / DLL files
