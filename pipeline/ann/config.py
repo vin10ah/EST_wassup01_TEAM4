@@ -33,7 +33,7 @@ config = {
                           # 8, # rolling_mean
                           ] 
   },
-
+  'predict_mode' : 'short', # choose between 'short' and 'long' 
   'model': MANN,
   'model_params': {
     'input_dim': 'auto', 
@@ -45,8 +45,8 @@ config = {
 
   'train_params': {
     'dataset_params':{
-      'window_size': 10,
-      'prediction_size': 5
+      'window_size': 24 * 3,
+      'prediction_size': 24 * 1
     },
     'trn_data_loader_params': {
       'batch_size': 32,

@@ -63,6 +63,9 @@ def evaluate_long(
   model:nn.Module,
   criterion:callable,
   data_loader:DataLoader,
+  tst_size=int,
+  prediction_size=int,
+  window_size=int,
   device:str='cpu',
 )->float:
   '''evaluate
@@ -74,8 +77,9 @@ def evaluate_long(
     device: device
     metrcis: metrics
   '''
+  prds = []
   model.eval()
-  for _ in range(int(test_length/prediction_size)):
+  for _ in range(int(tst_size/prediction_size)):
     with torch.inference_mode():
       prd = model(inp.cuda()).cpu()
     inp = torch.concat([inp,prd])[-window_size:]
@@ -122,7 +126,6 @@ def main(cfg):
   trn_scale = scaler.fit_transform(trn[:, :1])
   tst_scale = scaler.transform(tst[:, :1])
   
-  
   if c_n >= 2:
     scaler2 = MinMaxScaler()
     trn_m = scaler2.fit_transform(trn[:, 1:])
@@ -159,19 +162,25 @@ def main(cfg):
   optim_params = train_params.get('optim_params')
   optimizer = Optim(model.parameters(), **optim_params)
 
-  #scheduler = self.lr_scheduler(optim, **self.scheduler_kwargs)
+  scheduler = lr_scheduler(optimizer, **scheduler_params)
 
   # loss_fn
   loss_fn = train_params.get('loss_fn')
   pbar = trange(train_params.get('epochs'))
   history = defaultdict(list)
 
+  # predict_mode
+  predict_mode = cfg.get('predict_mode')
   for _ in pbar:
     trn_loss = train_one_epoch(model, loss_fn, optimizer, trn_dl, device)
-    tst_loss = evaluate(model, loss_fn, tst_dl, device)
+    
+    if predict_mode == 'short':
+      tst_loss = evaluate(model, loss_fn, tst_dl, device)
+    elif predict_mode == 'long':
+      tst_loss = evaluate(model, loss_fn, tst_dl, device)
 
     # lr_scheduler
-    #scheduler.step(val_loss)
+    scheduler.step(tst_loss)
     
     history['trn_loss'].append(trn_loss)
     history['tst_loss'].append(tst_loss)
