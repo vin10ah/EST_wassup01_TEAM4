@@ -59,6 +59,27 @@ def evaluate(
 
   return loss.item()
 
+def evaluate_long(
+  model:nn.Module,
+  criterion:callable,
+  data_loader:DataLoader,
+  device:str='cpu',
+)->float:
+  '''evaluate
+
+  Args:
+    model: model
+    criterions: list of criterion functions
+    data_loader: data loader
+    device: device
+    metrcis: metrics
+  '''
+  model.eval()
+  for _ in range(int(test_length/prediction_size)):
+    with torch.inference_mode():
+      prd = model(inp.cuda()).cpu()
+    inp = torch.concat([inp,prd])[-window_size:]
+    prds.append(prd)
 
 def main(cfg):
   import numpy as np
@@ -70,7 +91,7 @@ def main(cfg):
   from collections import defaultdict
   from sklearn.preprocessing import MinMaxScaler
   
-  from metric import mape, mae
+  from metric import mape, mae, R2_score, mse, rmse
   from preprocess import preprocess
 
 
@@ -190,7 +211,7 @@ def main(cfg):
   plt.plot(range(tst_size), p, color='#16344E', label="Prediction")
   plt.plot(range(tst_size), y, color='#71706C', label="True")
   plt.legend()
-  plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}")
+  plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, MSE:{mse(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
   plt.savefig(f'predict_{log}.png')
 
   # model
