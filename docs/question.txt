@@ -1,8 +1,0 @@
-# question LIST
-1. 테스트 순서
-   (1) train 훈련 후 val로 확인
-   (2) (1)의 훈련모델로 test 확인 (새로운 데이터로 한번 더 확인하는 과정)
-   (3) train + val 훈련 후 test로 확인
-
-2. metric error
- mse loss error

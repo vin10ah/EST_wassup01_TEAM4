@@ -14,6 +14,7 @@ def preprocess(data, num_idx, tst_size, window_size, select_channel_idx, split:L
   data=df2d_to_array3d(data) # (60, 2040, 8)
   data_df = pd.DataFrame(data[num_idx,:,:])
   data_df['rolling_mean'] = data_df.iloc[:, 0].rolling(24).mean()
+  data_df['diff'] = data_df.iloc[:, 0].diff(24)
   data_df = data_df.dropna() # (2017, 9)
   data = data_df.values
 

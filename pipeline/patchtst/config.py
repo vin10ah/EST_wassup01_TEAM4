@@ -69,6 +69,6 @@ config = {
     },
 
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 200,
+    'epochs': 1,
   },
 }

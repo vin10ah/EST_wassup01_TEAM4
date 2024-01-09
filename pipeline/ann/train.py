@@ -182,7 +182,7 @@ def main(cfg):
   plt.plot(y1, color='#16344E', label='trn_loss')
   plt.plot(y2, color='#71706C', label='tst_loss')
   plt.legend()
-  plt.title('losses')
+  plt.title(f"Neural Network, Min_loss(test):{min(history['tst_loss']):.4f}")
   plt.savefig(f'losses_{log}.png')
 
   # predict and metric
