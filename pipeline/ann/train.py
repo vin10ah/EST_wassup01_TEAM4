@@ -3,6 +3,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 import torchmetrics
 from typing import Optional
+import numpy as np
 
 def train_one_epoch(
   model:nn.Module,
@@ -63,6 +64,7 @@ def evaluate_long(
   model:nn.Module,
   criterion:callable,
   data_loader:DataLoader,
+  tst_scale:np.array,
   tst_size=int,
   prediction_size=int,
   window_size=int,
@@ -78,15 +80,24 @@ def evaluate_long(
     metrcis: metrics
   '''
   prds = []
+  X = torch.tensor(data_loader.dataset[0][0]).flatten().unsqueeze(dim=0).to(device)
+  Y = torch.tensor(tst_scale[window_size:])
+  
   model.eval()
   for _ in range(int(tst_size/prediction_size)):
     with torch.inference_mode():
-      prd = model(inp.cuda()).cpu()
-    inp = torch.concat([inp,prd])[-window_size:]
-    prds.append(prd)
+      output = model(X).to(device)
+      output = output.flatten()
+    X = torch.concat([X.flatten(), output])[-window_size:]
+    X = X.unsqueeze(dim=0)
+    output = output.to('cpu')
+    prds.append(output)
+  prds = torch.tensor(np.concatenate(prds))
+  loss = criterion(prds, Y.squeeze(dim=1))
+
+  return loss.item()
 
 def main(cfg):
-  import numpy as np
   import pandas as pd
   from custom_ds import TimeseriesDataset
   from tqdm.auto import trange
@@ -118,16 +129,17 @@ def main(cfg):
   tst_size = preprocess_params.get('tst_size')
   select_channel_idx = preprocess_params.get('select_channel_idx')
   c_n = len(select_channel_idx)
+  scaler = preprocess_params.get('scaler')
 
   trn, tst = preprocess(data, num_idx, tst_size, window_size, select_channel_idx, split)
-
+  
   # data scale
-  scaler = MinMaxScaler()
+  scaler = scaler
   trn_scale = scaler.fit_transform(trn[:, :1])
   tst_scale = scaler.transform(tst[:, :1])
   
   if c_n >= 2:
-    scaler2 = MinMaxScaler()
+    scaler2 = scaler
     trn_m = scaler2.fit_transform(trn[:, 1:])
     trn_scale = np.concatenate((trn_scale, trn_m), axis=1)
 
@@ -174,10 +186,10 @@ def main(cfg):
   for _ in pbar:
     trn_loss = train_one_epoch(model, loss_fn, optimizer, trn_dl, device)
     
-    if predict_mode == 'short':
+    if predict_mode == 'one_step':
       tst_loss = evaluate(model, loss_fn, tst_dl, device)
-    elif predict_mode == 'long':
-      tst_loss = evaluate(model, loss_fn, tst_dl, device)
+    elif predict_mode == 'dynamic':
+      tst_loss = evaluate_long(model, loss_fn, tst_dl, tst_scale, tst_size, prediction_size,window_size , device)
 
     # lr_scheduler
     scheduler.step(tst_loss)
@@ -186,19 +198,41 @@ def main(cfg):
     history['tst_loss'].append(tst_loss)
     pbar.set_postfix(trn_loss=trn_loss, tst_loss=tst_loss)
 
-  # eval
-  model.eval()
-  with torch.inference_mode():
-    x, y = next(iter(tst_dl))
-    x, y = x.flatten(1).to(device), y[:,:,0].to(device)
-    prd = model(x)
-  
-  # inverse scale
-  y = scaler.inverse_transform(y.cpu())
-  prd = scaler.inverse_transform(prd.cpu())
- 
-  y = np.concatenate([y[:,0], y[-1,1:]])
-  p = np.concatenate([prd[:,0], prd[-1,1:]])
+  if predict_mode == 'one_step':
+    # eval
+    model.eval()
+    with torch.inference_mode():
+      x, y = next(iter(tst_dl))
+      x, y = x.flatten(1).to(device), y[:,:,0].to(device)
+      prd = model(x)
+
+    # inverse scale
+    y = scaler.inverse_transform(y.cpu())
+    prd = scaler.inverse_transform(prd.cpu())
+
+    y = np.concatenate([y[:,0], y[-1,1:]])
+    p = np.concatenate([prd[:,0], prd[-1,1:]])
+
+  elif predict_mode == 'dynamic':
+    prds = []
+    X = torch.tensor(tst_dl.dataset[0][0]).flatten().unsqueeze(dim=0).to(device)
+    Y = torch.tensor(tst_scale[window_size:])
+
+    model.eval()
+    for _ in range(int(tst_size/prediction_size)):
+      with torch.inference_mode():
+        output = model(X).to(device)
+        output = output.flatten()
+      X = torch.concat([X.flatten(), output])[-window_size:]
+      X = X.unsqueeze(dim=0)
+      output = output.to('cpu')
+      prds.append(output)
+
+    prds = torch.tensor(np.concatenate(prds))
+    # inverse scale
+    y = scaler.inverse_transform(Y)
+    p = scaler.inverse_transform(prds.unsqueeze(dim=1))
+    
 
   ###########
   ### log ###
@@ -206,13 +240,16 @@ def main(cfg):
   log = files.get('output_log')
 
   # loss(train, test)
+  tst_min = min(history['tst_loss'])
+  min_idx = history['tst_loss'].index(tst_min)
+
   y1 = history['trn_loss']
   y2 = history['tst_loss']
   plt.figure(figsize=(8, 6))
   plt.plot(y1, color='#16344E', label='trn_loss')
   plt.plot(y2, color='#71706C', label='tst_loss')
   plt.legend()
-  plt.title(f"Neural Network, Min_loss(test):{min(history['tst_loss']):.4f}")
+  plt.title(f"Neural Network, Min_loss(test):{tst_min:.4f}, Min_idx(test):{min_idx}")
   plt.savefig(f'losses_{log}.png')
 
   # predict and metric

@@ -31,9 +31,10 @@ config = {
                           # 6, # no_elec
                           # 7, # sunlight_have
                           # 8, # rolling_mean
+                          # 9, # diff
                           ] 
   },
-  'predict_mode' : 'short', # choose between 'short' and 'long' 
+  'predict_mode' : 'dynamic', # choose between 'one_step' and 'dynamic' 
   'model': MANN,
   'model_params': {
     'input_dim': 'auto', 
@@ -75,7 +76,7 @@ config = {
     },
     
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 1,
+    'epochs': 2,
   },
 
 }
