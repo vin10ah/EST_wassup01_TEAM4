@@ -18,9 +18,3 @@ def mse(y_pred, y_true):
 
 def rmse(y_pred, y_true):
   return np.sqrt(mse(y_pred, y_true))
-
-# def mse(y_pred, y_true):
-#   return F.mse_loss(y_pred, y_true)
-
-# def rmse(y_pred, y_true):
-#   return torch.sqrt(F.mse_loss(y_pred, y_true))

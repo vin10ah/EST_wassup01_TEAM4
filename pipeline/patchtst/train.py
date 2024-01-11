@@ -84,7 +84,7 @@ def main(cfg):
   
   # read_csv
   files = cfg.get('files')
-  data = pd.read_csv('../../data/train.csv')
+  data = pd.read_csv(files.get('data'))
 
   # preprocess prams
   preprocess_params = cfg.get('preprocess_params')
@@ -148,13 +148,16 @@ def main(cfg):
   log = files.get('output_log')
 
   # loss
+  tst_min = min(history['tst_loss'])
+  min_idx = history['tst_loss'].index(tst_min)
+
   y1 = history['trn_loss']
   y2 = history['tst_loss']
   plt.figure(figsize=(8, 6))
   plt.plot(y1, color='#16344E', label='trn_loss')
   plt.plot(y2, color='#71706C', label='tst_loss')
   plt.legend()
-  plt.title(f"PatchTST Losses, Min_loss(test):{min(history['tst_loss']):.4f}")
+  plt.title(f"PatchTST Losses, Min_loss(test):{tst_min:.4f}, Min_idx(test):{min_idx}")
   plt.savefig(f'losses_{log}.png')
 
   # predict and metric
@@ -184,7 +187,3 @@ if __name__ == "__main__":
 
 
   #TODO
-  '''
-  장기예측
-
-  '''

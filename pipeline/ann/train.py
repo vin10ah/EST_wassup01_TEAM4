@@ -115,7 +115,7 @@ def main(cfg):
   
   # read_csv
   files = cfg.get('files')
-  data = pd.read_csv('../../data/train.csv')
+  data = pd.read_csv(files.get('data'))
 
   # dataset
   dataset_params = train_params.get('dataset_params')

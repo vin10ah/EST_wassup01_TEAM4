@@ -10,12 +10,8 @@ import pytz
 config = {
 
   'files': {
-    'X_trn': '../../data/train.csv',
-    'y_trn': './data/y_trn.csv',
-    'X_tst': './data/X_tst.csv',
-    'y_tst': './data/y_tst.csv',
+    'data': '../../data/train.csv',
     'output_log': datetime.now(pytz.timezone('Asia/Seoul')).strftime("%d%H%M%S"),
-    'output_csv': './results/five_fold.csv',
   },
 
   'preprocess_params': {

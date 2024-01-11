@@ -4,17 +4,13 @@ import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from m_nn import MANN
 from datetime import datetime
-from torchmetrics import MetricCollection
-from torchmetrics.regression import MeanAbsoluteError, MeanAbsolutePercentageError
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
 config = {
 
   'files': {
-    'X_csv': '../../data/train.csv',
-    'y_csv': './trn_y.csv',
+    'data': '../../data/train.csv',
     'output_log': datetime.now().strftime("%d%H%M%S"),
-    'output_csv': 'five_fold.csv',
   },
   'preprocess_params': {
     'num_idx': 0, # building idx
@@ -34,7 +30,7 @@ config = {
                           # 9, # diff
                           ] 
   },
-  'predict_mode' : 'dynamic', # choose between 'one_step' and 'dynamic' 
+  'predict_mode' : 'one_step', # choose between 'one_step' and 'dynamic' 
   'model': MANN,
   'model_params': {
     'input_dim': 'auto', 
@@ -60,13 +56,9 @@ config = {
     'loss_fn': nn.functional.mse_loss,
     'optim': torch.optim.AdamW,
     'optim_params': {
-      'lr': 0.01,
+      'lr': 0.001,
       'weight_decay': 0
     },
-    'metric': MetricCollection({
-               'mae': MeanAbsoluteError(),
-               'mape':MeanAbsolutePercentageError(),
-               }),
     'lr_scheduler': ReduceLROnPlateau,
     'scheduler_params': {
       'mode': 'min',
@@ -76,7 +68,7 @@ config = {
     },
     
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 2,
+    'epochs': 1,
   },
 
 }
