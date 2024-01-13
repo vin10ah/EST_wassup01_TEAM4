@@ -256,7 +256,7 @@ def main(cfg):
   plt.plot(range(tst_size), p, color='#16344E', label="Prediction")
   plt.plot(range(tst_size), y, color='#71706C', label="True")
   plt.legend()
-  plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, MSE:{mse(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
+  plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
   plt.savefig(f'predict_{log}.png')
 
   # model
