@@ -65,14 +65,14 @@ def main(cfg):
   import pandas as pd
   from tqdm.auto import trange
   import matplotlib.pyplot as plt
-  import seaborn as sns
 
   from patchtsdataset import PatchTSDataset
-  from metric import mape, mae, R2_score, mse, rmse
+  from metric import mape, mae, R2_score, rmse
   from preprocess import preprocess
 
   train_params = cfg.get('train_params')
   device = torch.device(train_params.get('device'))
+  output = cfg.get('output')
 
   model = cfg.get('model')
   model_params = cfg.get('model_params')
@@ -145,7 +145,7 @@ def main(cfg):
   p = np.concatenate([p[:,0], p[-1,1:]])
   
   # log
-  log = files.get('output_log')
+  log = output.get('output_log')
 
   # loss
   tst_min = min(history['tst_loss'])
@@ -166,7 +166,7 @@ def main(cfg):
   plt.plot(range(predict_range), y, label="True")
   plt.plot(range(predict_range), p, label="Prediction")
   plt.legend()
-  plt.title(f"PatchTST, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, MSE:{mse(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
+  plt.title(f"PatchTST, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
   plt.savefig(f'predict_{log}.png')
 
   # model

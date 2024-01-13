@@ -11,23 +11,29 @@ config = {
 
   'files': {
     'data': '../../data/train.csv',
-    'output_log': datetime.now(pytz.timezone('Asia/Seoul')).strftime("%d%H%M%S"),
+  },
+
+  'output': {
+    'output_log': datetime.now().strftime("%d%H%M%S"),
+    'load_pth_24':'../../results/patchtst/best24.pth',
+    'load_pth_168':'../../results/patchtst/best168.pth',
   },
 
   'preprocess_params': {
     'num_idx': 0, # building idx
-    'split': 'train', # choose between 'train' and 'test' 
+    'split': 'test', # choose between 'train' and 'test' 
     'tst_size': 24 * 7, # 24 hours x 7 = 7 days
     'scaler': MinMaxScaler(),
     'select_channel_idx':[
-                          # 0, # temp
-                          # 1, # wind_speed
-                          # 2, # humidity
-                          # 3, # rainfall
+                          #0, # temp
+                          #1, # wind_speed
+                          #2, # humidity
+                          #3, # rainfall
                           # 4, # sunshine
                           # 5, # no_elec
                           # 6, # sunlight_have
                           # 7, # rolling_mean
+                          # 8, # diff
                           ] 
   },
 
@@ -35,7 +41,7 @@ config = {
   'model_params': {
     'n_token': 64, # n_patches
     'input_dim': 16, # input_dim(patch_length) Must be an even number
-    'model_dim': 128, # node
+    'model_dim': 32, # node
     'num_heads': 16, # multihead
     'num_layers': 3, # transformer layer
     'output_dim': 24, # prediction_length
@@ -43,7 +49,7 @@ config = {
 
   'train_params': {
     'trn_data_loader_params': {
-      'batch_size': 64,
+      'batch_size': 32,
       'shuffle': True
     },
     'tst_data_loader_params': {
@@ -65,6 +71,6 @@ config = {
     },
 
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 1,
+    'epochs': 10,
   },
 }

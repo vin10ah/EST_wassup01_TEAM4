@@ -102,9 +102,7 @@ def main(cfg):
   from custom_ds import TimeseriesDataset
   from tqdm.auto import trange
   import matplotlib.pyplot as plt
-  import seaborn as sns
   from collections import defaultdict
-  from sklearn.preprocessing import MinMaxScaler
   
   from metric import mape, mae, R2_score, mse, rmse
   from preprocess import preprocess
@@ -130,7 +128,7 @@ def main(cfg):
   select_channel_idx = preprocess_params.get('select_channel_idx')
   c_n = len(select_channel_idx)
   scaler = preprocess_params.get('scaler')
-
+  
   trn, tst = preprocess(data, num_idx, tst_size, window_size, select_channel_idx, split)
   
   # data scale
@@ -192,7 +190,7 @@ def main(cfg):
       tst_loss = evaluate_long(model, loss_fn, tst_dl, tst_scale, tst_size, prediction_size,window_size , device)
 
     # lr_scheduler
-    scheduler.step(tst_loss)
+    # scheduler.step(tst_loss)
     
     history['trn_loss'].append(trn_loss)
     history['tst_loss'].append(tst_loss)
@@ -232,12 +230,13 @@ def main(cfg):
     # inverse scale
     y = scaler.inverse_transform(Y)
     p = scaler.inverse_transform(prds.unsqueeze(dim=1))
-    
+
 
   ###########
   ### log ###
   ###########
-  log = files.get('output_log')
+  output = cfg.get('output')
+  log = output.get('output_log')
 
   # loss(train, test)
   tst_min = min(history['tst_loss'])

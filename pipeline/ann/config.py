@@ -10,12 +10,17 @@ config = {
 
   'files': {
     'data': '../../data/train.csv',
+  },
+  'output': {
     'output_log': datetime.now().strftime("%d%H%M%S"),
+    'load_pth_24':'../../results/ann/best24.pth',
+    'load_pth_168':'../../results/ann/best168.pth',
+    'load_pth_168d':'../../results/ann/best24d.pth',
   },
   'preprocess_params': {
     'num_idx': 0, # building idx
     'split': 'train', # choose between 'train' and 'test' 
-    'tst_size': 24 * 7, # 24 hours x 7 = 7 days
+    'tst_size': 24 * 1, # 24 hours x 7 = 7 days
     'scaler': MinMaxScaler(),
     'select_channel_idx':[
                           0, # elec_amount (This must be used)
@@ -24,18 +29,16 @@ config = {
                           # 3, # humidity
                           # 4, # rainfall
                           # 5, # sunshine
-                          # 6, # no_elec
-                          # 7, # sunlight_have
-                          # 8, # rolling_mean
-                          # 9, # diff
-                          ] 
+                          # 6, # rolling_mean
+                          # 7, # diff
+                          ]
   },
-  'predict_mode' : 'one_step', # choose between 'one_step' and 'dynamic' 
+  'predict_mode' : 'dynamic', # choose between 'one_step' and 'dynamic' 
   'model': MANN,
   'model_params': {
-    'input_dim': 'auto', 
+    'input_dim': 'auto',
     'output_dim': 'auto',
-    'hidden_dim':512,
+    # 'hidden_dim':512,
     'c_n': 'auto',
     'activation': F.relu,
   },
@@ -46,7 +49,7 @@ config = {
       'prediction_size': 24 * 1
     },
     'trn_data_loader_params': {
-      'batch_size': 32,
+      'batch_size': 64,
       'shuffle': True,
     },
     'tst_data_loader_params': {
@@ -56,9 +59,10 @@ config = {
     'loss_fn': nn.functional.mse_loss,
     'optim': torch.optim.AdamW,
     'optim_params': {
-      'lr': 0.001,
+      'lr': 0.00001,
       'weight_decay': 0
     },
+
     'lr_scheduler': ReduceLROnPlateau,
     'scheduler_params': {
       'mode': 'min',
@@ -68,7 +72,6 @@ config = {
     },
     
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 1,
+    'epochs': 400,
   },
-
 }
