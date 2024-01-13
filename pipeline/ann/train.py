@@ -60,7 +60,7 @@ def evaluate(
 
   return loss.item()
 
-def evaluate_long(
+def evaluate_dynamic(
   model:nn.Module,
   criterion:callable,
   data_loader:DataLoader,
@@ -104,7 +104,7 @@ def main(cfg):
   import matplotlib.pyplot as plt
   from collections import defaultdict
   
-  from metric import mape, mae, R2_score, mse, rmse
+  from metric import mape, mae, R2_score, rmse
   from preprocess import preprocess
 
 
@@ -128,6 +128,7 @@ def main(cfg):
   select_channel_idx = preprocess_params.get('select_channel_idx')
   c_n = len(select_channel_idx)
   scaler = preprocess_params.get('scaler')
+  scaler2 = preprocess_params.get('scaler2')
   
   trn, tst = preprocess(data, num_idx, tst_size, window_size, select_channel_idx, split)
   
@@ -137,7 +138,7 @@ def main(cfg):
   tst_scale = scaler.transform(tst[:, :1])
   
   if c_n >= 2:
-    scaler2 = scaler
+    scaler2 = scaler2
     trn_m = scaler2.fit_transform(trn[:, 1:])
     trn_scale = np.concatenate((trn_scale, trn_m), axis=1)
 
@@ -187,10 +188,10 @@ def main(cfg):
     if predict_mode == 'one_step':
       tst_loss = evaluate(model, loss_fn, tst_dl, device)
     elif predict_mode == 'dynamic':
-      tst_loss = evaluate_long(model, loss_fn, tst_dl, tst_scale, tst_size, prediction_size,window_size , device)
+      tst_loss = evaluate_dynamic(model, loss_fn, tst_dl, tst_scale, tst_size, prediction_size,window_size , device)
 
     # lr_scheduler
-    # scheduler.step(tst_loss)
+    #scheduler.step(tst_loss)
     
     history['trn_loss'].append(trn_loss)
     history['tst_loss'].append(tst_loss)
@@ -203,7 +204,7 @@ def main(cfg):
       x, y = next(iter(tst_dl))
       x, y = x.flatten(1).to(device), y[:,:,0].to(device)
       prd = model(x)
-
+    
     # inverse scale
     y = scaler.inverse_transform(y.cpu())
     prd = scaler.inverse_transform(prd.cpu())

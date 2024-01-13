@@ -20,20 +20,21 @@ config = {
   'preprocess_params': {
     'num_idx': 0, # building idx
     'split': 'train', # choose between 'train' and 'test' 
-    'tst_size': 24 * 1, # 24 hours x 7 = 7 days
+    'tst_size': 24 * 1, # 24 hours x n = n days
     'scaler': MinMaxScaler(),
+    'scaler2': MinMaxScaler(),
     'select_channel_idx':[
                           0, # elec_amount (This must be used)
-                          # 1, # temp
+                          1, # temp
                           # 2, # wind_speed
                           # 3, # humidity
-                          # 4, # rainfall
+                          4, # rainfall
                           # 5, # sunshine
-                          # 6, # rolling_mean
-                          # 7, # diff
+                          6, # rolling_mean
+                          7, # diff
                           ]
   },
-  'predict_mode' : 'dynamic', # choose between 'one_step' and 'dynamic' 
+  'predict_mode' : 'one_step', # choose between 'one_step' and 'dynamic'
   'model': MANN,
   'model_params': {
     'input_dim': 'auto',
@@ -72,6 +73,6 @@ config = {
     },
     
     'device': "cuda" if torch.cuda.is_available() else "cpu",
-    'epochs': 400,
+    'epochs': 270,
   },
 }
