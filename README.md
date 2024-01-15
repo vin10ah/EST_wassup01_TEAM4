@@ -38,7 +38,7 @@
 - Features
 	- 7 features are selected 5 from over 9 features <br>
 	(temp, wind_speed, humidity, rainfall, sunshine) <br>
-	+ 2 features is created (rolling mean, diff)
+	+ 2 features are created (rolling mean, diff)
   
 - Target
 	- elec_amout
