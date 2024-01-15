@@ -18,7 +18,7 @@
 1) `pip install -r requirements.txt` to install required packages
 2) Set the mode in the pipeline model's config
 3) you can choose one between two options : split = train, test, predict_mode = one_step, dynamic
-4) also choose select_channel_idx = 0, # elec_amount (This must be used) <br>
+4) also choose select_channel_idx = 0, <br># elec_amount (This must be used) <br>
                                       # 1, # temp<br>
                                       # 2, # wind_speed<br>
                                       # 3, # humidity<br>
