@@ -9,5 +9,13 @@
 이재석 : <br>
 정문선 : <br></ul>
 
+### Directory
+- `archive`: history
+- `data`: origin train data
+- `config`: setting files for model parameters
+- `doc`: documents, images, reports
+- `pipeline`: ANN models, PATCHTST models
+- `results`: Random Forest models
+- `requirements.txt`: required libraries and packages 
 
 <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white"> <img src = "https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
