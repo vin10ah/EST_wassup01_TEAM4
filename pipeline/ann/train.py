@@ -165,8 +165,8 @@ def main(cfg):
   model = model(**model_params).to(device)
 
   # lr_scheduler setting
-  lr_scheduler = train_params.get('lr_scheduler')
-  scheduler_params = train_params.get('scheduler_params')
+  lr_scheduler = train_params.get('lr_scheduler3')
+  scheduler_params = train_params.get('scheduler_params3')
 
   # optimizer
   Optim = train_params.get('optim')
@@ -180,6 +180,7 @@ def main(cfg):
   pbar = trange(train_params.get('epochs'))
   history = defaultdict(list)
 
+  lrs = []
   # predict_mode
   predict_mode = cfg.get('predict_mode')
   for _ in pbar:
@@ -190,9 +191,13 @@ def main(cfg):
     elif predict_mode == 'dynamic':
       tst_loss = evaluate_dynamic(model, loss_fn, tst_dl, tst_scale, tst_size, prediction_size,window_size , device)
 
-    # lr_scheduler
+    lrs.append(optimizer.param_groups[0]["lr"])
+    # lr_scheduler1
     #scheduler.step(tst_loss)
     
+    # lr_scheduler2
+    scheduler.step()
+
     history['trn_loss'].append(trn_loss)
     history['tst_loss'].append(tst_loss)
     pbar.set_postfix(trn_loss=trn_loss, tst_loss=tst_loss)
@@ -260,6 +265,12 @@ def main(cfg):
   plt.title(f"Neural Network, MAPE:{mape(p,y):.4f}, MAE:{mae(p,y):.4f}, R2_SCORE:{R2_score(p,y):.4f}, RMSE:{rmse(p,y):.4f}")
   plt.savefig(f'predict_{log}.png')
 
+
+  # lr
+  plt.figure(figsize=(8, 6))
+  plt.plot(lrs)
+  plt.savefig(f'lrs_{log}.png')
+  
   # model
   torch.save(model.state_dict(), f'./{log}_model.pth')
 
