@@ -13,7 +13,7 @@
 - `pipeline`: ANN models, PATCHTST models
 - `results`: Random Forest models
 - `requirements.txt`: required libraries and packages
-- 
+
 ### How to Run
 1) `pip install -r requirements.txt` to install required packages
 2) Set the mode in the pipeline model's config
