@@ -18,20 +18,18 @@
 1) `pip install -r requirements.txt` to install required packages
 2) Set the mode in the pipeline model's config
 3) you can choose one between two options : split = train, test, predict_mode = one_step, dynamic
-4) also choose select_channel_idx = 0, # elec_amount (This must be used)
-                                      # 1, # temp
-                                      # 2, # wind_speed
-                                      # 3, # humidity
-                                      # 4, # rainfall
-                                      # 5, # sunshine
-                                      # 6, # rolling_mean
-                                      # 7, # diff
+4) also choose select_channel_idx = 0, # elec_amount (This must be used) <br>
+                                      # 1, # temp<br>
+                                      # 2, # wind_speed<br>
+                                      # 3, # humidity<br>
+                                      # 4, # rainfall<br>
+                                      # 5, # sunshine<br>
+                                      # 6, # rolling_mean<br>
+                                      # 7, # diff<br>
 5) then, try this!
 
 ### Dataset
-- Source: Korea National Health & Nuturition Examination Survey ([link](https://knhanes.kdca.go.kr/knhanes/sub03/sub03_01.do))
-	- Only respondents aged over 19 are selected 
-	- Respondents are chosen from the population with 0.0002 extraction rate
+- Source: 
 - Train & Test Set
 	- Train Set: survey of 2007 ~ 2019, and 2021 
 	- Test Set: survey of 2020
