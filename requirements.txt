@@ -3,3 +3,9 @@ jupyterlab
 matplotlib
 seaborn
 tqdm
+pandas
+matplotlib
+numpy
+sklearn
+statsmodels
+pmdarima
