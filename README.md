@@ -29,26 +29,19 @@
 5) then, try this!
 
 ### Dataset
-- Source: 
+- Source: (https://dacon.io/competitions/official/235736/data)
 - Train & Test Set
-	- Train Set: survey of 2007 ~ 2019, and 2021 
-	- Test Set: survey of 2020
-- Features (independent variables, X)
-	- 125 features are selected from over 800 features 
-		- including the results of multiple blood tests, urine tests to intensity of daily workouts, education level, and even whether to brush their teeth.
-	- Tried to use as many as possible features but,
-		1) features with a high proportion of NaN values are discarded. 
-		2) features which can be representative of similar questions
-		3) commonly used features among 2007 ~ 2021, selected year.
-- Target (dependent variable, y)
-	- `depressed` variables have been defined. `depressed` == 1 if:
-		1) `mh_PHQ_S` >= 10 or # `mh_PHQ_S`: total score of PHQ self test
-		2) `BP_PHQ_9`.isin([1, 2, 3]) or # `BP_PHQ_9`: 9th question of PHQ self-test, "Have you ever thought about suicide or hurting yourself this year?"
-		3) `BP6_10` == 1 or  # `BP6_10`: "Have you ever thought about suicide this year?"
-		4) `BP6_31` == 1 or # `BP6_31`: "Have you ever thought about hurting yourself this year?"
-		5) `DF2_pr` == 1 & `mh_PHQ_S`== NaN # `DF2_pr==1`: currently experiencing depression and have been diagnosed by a doctor
-	- A respondent with no information on depression-related variables has been removed rather than filling in missing values.
-	- Reference of definition of depression: National Health Insurance ([link](https://www.nhis.or.kr/static/alim/paper/oldpaper/202001/sub/s01_02.html))
+	- total data : 2040
+	- Train Set: 1681
+ 	- validation Set: 168
+	- Test Set: 168
+- Features
+	- 7 features are selected 5 from over 9 features <br>
+	(temp, wind_speed, humidity, rainfall, sunshine) <br>
+	+ 2 features is created (rolling mean, diff)
+  
+- Target
+	- elec_amout
 
 ### Preprocessing
 ![Pre_processing](https://github.com/Bong-HoonLee/EST_wassup01_TEAM_4/assets/76639910/54a9fb38-71f9-4a13-a8e5-7c28efd41477)
