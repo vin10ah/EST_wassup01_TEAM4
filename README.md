@@ -45,3 +45,8 @@
 
 
 ### Results
+
+![24](https://github.com/Bong-HoonLee/EST_wassup01_TEAM4/assets/144428051/08196a6f-6dfa-475a-84b6-dda0b6b34b57)
+![168](https://github.com/Bong-HoonLee/EST_wassup01_TEAM4/assets/144428051/302fa27a-c9ca-4c4f-8c23-0e7ce41de6a0)
+
+
